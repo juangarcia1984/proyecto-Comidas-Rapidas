@@ -1,5 +1,10 @@
 //variables globales
 let tablacarrito = document.querySelector(".cart-table tbody");
+let resumensubtotal = document.querySelector(".sub-total");
+let resumendescuento = document.querySelector(".promo");
+let resumentotal = document.querySelector(".total");
+let destino = document.querySelector(".destino");
+let resumendomicilio = document.querySelector(".valor-domi");
 
 //agregar evento al nabegador
 document.addEventListener("DOMContentLoaded", ()=>{
@@ -29,7 +34,7 @@ function cargarproductos() {
         <td>
         <div class="quantity quantity-wrap">
             <div class="decrement" onclick="actualizarcantidad(${i}, -1)"> <i class="fa-solid fa-minus"></i></div>
-            <input class="text" type="number" name="quantity" value="${producto.cantidad || 1}" maxlength="2" size="1" readonly>
+            <input class="number" type="text" name="quantity" value="${producto.cantidad || 1}" maxlength="2" size="1" readonly>
             <div class="increment" onclick="actualizarcantidad(${i}, 1)"> <i class="fa-solid fa-plus"></i></div>
         </div>
         </td>
@@ -45,7 +50,9 @@ function cargarproductos() {
         </td>   
         `;
         tablacarrito.appendChild(fila);
-    }       
+    }
+    //ejecutar el resumen de compra
+    resumencompra();       
 }
 
 //funcion para actualizar cantidades del producto
@@ -79,3 +86,40 @@ function borrarproducto(pos) {
     cargarproductos();
 
 }
+
+//funcion para el resumen de la compra
+function resumencompra(){
+    let todosproductos = JSON.parse(localStorage.getItem("pro-carrito")) || [];
+    let subtotal = 0;//acumular el subtotal de los productos
+    //recorre cada producto y acumulamos en el subtotal
+    todosproductos.forEach((producto)=>{
+        subtotal += producto.precio * producto.cantidad;
+    });
+
+    //calcular el valor del domicilio
+    let domicilio = 0;
+    switch (destino.value) {
+        case "Medellin": default: domicilio; break;
+        case "Bello": domicilio = 10.000; break; 
+        case "Copacabana": case "Caldas": case "La Estrella": domicilio = 20.000; break;
+        case "Envigado": case "Itagui": case "Sabaneta": domicilio = 15.000; break;
+    }
+
+    //calcular descuento del 10% si compra es mayor a 100000
+    let descuento = (subtotal >= 100.000) ? subtotal * 0.1 : 0
+
+    //calcular el total de la compra
+    let totalpagar = subtotal - descuento + domicilio;
+
+    //mostrar los calculos de resumen de compra
+    resumensubtotal.textContent = subtotal.toFixed(3);
+    resumendescuento.textContent = descuento.toFixed(3);
+    resumentotal.textContent = totalpagar.toFixed(3);
+    resumendomicilio.textContent = domicilio.toFixed(3);
+}
+
+//agregar evento al destino para calcular el valor del domicilio
+destino.addEventListener("change", ()=>{
+    //actualizar el resumen de la compra
+    resumencompra();
+})

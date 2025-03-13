@@ -10,6 +10,8 @@ let btnresumen = document.querySelector(".btn-resumen");
 //agregar evento al nabegador
 document.addEventListener("DOMContentLoaded", ()=>{
     cargarproductos();
+    cargarDatosEntrega();
+    cargarResumenOrden();
 });
 
 //funcion cargar productos guardados en localstorage
@@ -145,3 +147,8 @@ btnresumen.addEventListener("click", ()=>{
    //redirigir al usuario a la pagina de pago
    location.href = "checkout.html";
 })
+
+
+
+
+
